@@ -30,3 +30,4 @@ dist/
 # Файлы ОС
 .DS_Store
 Thumbs.db
+.coverage
