@@ -16,12 +16,24 @@
 - `filter_by_state` — фильтрация операций по статусу
 - `sort_by_date` — сортировка операций по дате
 
+### `src/generators.py`
+- `filter_by_currency` — фильтрация транзакций по валюте
+- `transaction_descriptions` — описания транзакций
+- `card_number_generator` — генерация номеров карт
+
 ## Установка
 
 1. Клонируйте репозиторий:
+
+```
 git clone https://github.com/TheIsmarin/bank_widget.git
+```
+
 2. Установите зависимости:
+
+```
 poetry install
+```
 
 ## Примеры использования
 
@@ -29,11 +41,17 @@ poetry install
 from src.masks import get_mask_card_number, get_mask_account
 from src.widget import mask_account_card, get_date
 from src.processing import filter_by_state, sort_by_date
+from src.generators import (
+    filter_by_currency,
+    transaction_descriptions,
+    card_number_generator,
+)
 
 # Маскировка карты и счета
 print(get_mask_card_number("7000792289606361"))  # 7000 79** **** 6361
 print(get_mask_account("73654108430135874305"))  # **4305
 print(mask_account_card("Visa Platinum 7000792289606361"))  # Visa Platinum 7000 79** **** 6361
+print(mask_account_card("Счет 73654108430135874305"))  # Счет **4305
 
 # Работа с датой
 print(get_date("2024-03-11T02:26:18.671407"))  # 11.03.2024
@@ -45,3 +63,48 @@ operations = [
 ]
 print(filter_by_state(operations))  # только EXECUTED
 print(sort_by_date(operations))     # отсортировано по дате
+
+# Генераторы
+transactions = [
+    {
+        "id": 939719570,
+        "operationAmount": {"currency": {"code": "USD"}},
+        "description": "Перевод организации",
+    },
+]
+usd = filter_by_currency(transactions, "USD")
+print(next(usd))  # транзакция в USD
+
+for card in card_number_generator(1, 3):
+    print(card)
+# 0000 0000 0000 0001
+# 0000 0000 0000 0002
+# 0000 0000 0000 0003
+```
+
+## Тестирование
+
+Проект покрыт тестами с использованием `pytest` и `pytest-cov`.
+
+### Запуск тестов
+
+```
+poetry run pytest
+```
+
+### Запуск с покрытием
+
+```
+poetry run pytest --cov=src --cov-report=html
+```
+
+Покрытие: 100%
+
+Отчёт покрытия: `htmlcov/index.html`
+
+### Структура тестов
+
+- `tests/test_masks.py` — тесты для маскировки
+- `tests/test_widget.py` — тесты для виджета
+- `tests/test_processing.py` — тесты для обработки
+- `tests/test_generators.py` — тесты для генераторов
