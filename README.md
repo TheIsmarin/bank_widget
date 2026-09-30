@@ -21,6 +21,9 @@
 - `transaction_descriptions` — описания транзакций
 - `card_number_generator` — генерация номеров карт
 
+### `src/decorators.py`
+- `log` — декоратор для логирования вызовов функций (в консоль или файл)
+
 ## Установка
 
 1. Клонируйте репозиторий:
@@ -80,6 +83,21 @@ for card in card_number_generator(1, 3):
 # 0000 0000 0000 0001
 # 0000 0000 0000 0002
 # 0000 0000 0000 0003
+
+# Декоратор log
+from src.decorators import log
+
+@log()
+def add(x, y):
+    return x + y
+
+add(1, 2)  # В консоль: add ok
+
+@log(filename="mylog.txt")
+def divide(x, y):
+    return x / y
+
+divide(1, 0)  # В файл: divide error: ZeroDivisionError. Inputs: (1, 0), {}
 ```
 
 ## Тестирование
@@ -108,3 +126,4 @@ poetry run pytest --cov=src --cov-report=html
 - `tests/test_widget.py` — тесты для виджета
 - `tests/test_processing.py` — тесты для обработки
 - `tests/test_generators.py` — тесты для генераторов
+- `tests/test_decorators.py` — тесты для декораторов
