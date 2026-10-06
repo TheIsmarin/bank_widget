@@ -21,6 +21,12 @@
 - `transaction_descriptions` — описания транзакций
 - `card_number_generator` — генерация номеров карт
 
+### `src/utils.py`
+- `load_transactions` — загрузка транзакций из JSON-файла
+
+### `src/external_api.py`
+- `convert_to_rub` — конвертация суммы транзакции в рубли
+
 ## Установка
 
 1. Клонируйте репозиторий:
@@ -80,6 +86,23 @@ for card in card_number_generator(1, 3):
 # 0000 0000 0000 0001
 # 0000 0000 0000 0002
 # 0000 0000 0000 0003
+
+# Загрузка транзакций
+from src.utils import load_transactions
+
+transactions = load_transactions("data/operations.json")
+print(len(transactions))  # количество транзакций
+
+# Конвертация валюты
+from src.external_api import convert_to_rub
+
+transaction = {
+    "operationAmount": {
+        "amount": "1000.00",
+        "currency": {"code": "USD"},
+    }
+}
+print(convert_to_rub(transaction))  # сумма в рублях
 ```
 
 ## Тестирование
@@ -108,3 +131,5 @@ poetry run pytest --cov=src --cov-report=html
 - `tests/test_widget.py` — тесты для виджета
 - `tests/test_processing.py` — тесты для обработки
 - `tests/test_generators.py` — тесты для генераторов
+- `tests/test_utils.py` — тесты для загрузки JSON
+- `tests/test_external_api.py` — тесты для конвертации валют
