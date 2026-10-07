@@ -42,9 +42,7 @@ class TestFilterByCurrency:
     def test_filter_usd(self, transactions):
         result = list(filter_by_currency(transactions, "USD"))
         assert len(result) == 3
-        assert all(
-            t["operationAmount"]["currency"]["code"] == "USD" for t in result
-        )
+        assert all(t["operationAmount"]["currency"]["code"] == "USD" for t in result)
 
     def test_filter_rub(self, transactions):
         result = list(filter_by_currency(transactions, "RUB"))
