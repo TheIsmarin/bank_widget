@@ -25,10 +25,14 @@ build/
 dist/
 *.egg-info/
 
-# Логи
-*.log
 
 # Файлы ОС
 .DS_Store
 Thumbs.db
 .coverage
+
+# ����
+logs/
+*.log
+
+
