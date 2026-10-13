@@ -27,6 +27,10 @@
 ### `src/external_api.py`
 - `convert_to_rub` — конвертация суммы транзакции в рубли
 
+### `src/readers.py`
+- `read_csv_transactions` — чтение транзакций из CSV-файла
+- `read_excel_transactions` — чтение транзакций из Excel-файла
+
 ## Установка
 
 1. Клонируйте репозиторий:
@@ -103,6 +107,15 @@ transaction = {
     }
 }
 print(convert_to_rub(transaction))  # сумма в рублях
+
+# Чтение CSV и Excel
+from src.readers import read_csv_transactions, read_excel_transactions
+
+csv_data = read_csv_transactions("data/transactions.csv")
+print(len(csv_data))  # количество транзакций
+
+excel_data = read_excel_transactions("data/transactions_excel.xlsx")
+print(len(excel_data))  # количество транзакций
 ```
 
 ## Тестирование
@@ -133,7 +146,7 @@ poetry run pytest --cov=src --cov-report=html
 - `tests/test_generators.py` — тесты для генераторов
 - `tests/test_utils.py` — тесты для загрузки JSON
 - `tests/test_external_api.py` — тесты для конвертации валют
-
+- `tests/test_readers.py` — тесты для чтения CSV и Excel
 
 ## Логирование
 
