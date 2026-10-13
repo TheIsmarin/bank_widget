@@ -9,8 +9,6 @@ readme = "README.md"
 python = "^3.13"
 requests = "^2.34.2"
 python-dotenv = "^1.2.4"
-pandas = "^3.0.6"
-openpyxl = "^3.1.5"
 
 [build-system]
 requires = ["poetry-core"]
@@ -44,7 +42,3 @@ no_implicit_optional = true
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
-
-[[tool.mypy.overrides]]
-module = "pandas.*"
-ignore_missing_imports = true
