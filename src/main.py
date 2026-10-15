@@ -1,5 +1,7 @@
 """Основной модуль программы."""
 
+from src.generators import filter_by_currency
+from src.processing import filter_by_state, sort_by_date
 from src.readers import read_csv_transactions, read_excel_transactions
 from src.search import process_bank_search
 from src.utils import load_transactions
@@ -20,46 +22,11 @@ def _load_transactions(choice: str) -> list[dict]:
     return []
 
 
-def _filter_by_status(transactions: list[dict]) -> list[dict]:
-    """Фильтрует по статусу."""
-    while True:
-        print("Введите статус, по которому необходимо выполнить фильтрацию.")
-        print("Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING")
-        status = input().strip().upper()
-        if status in ("EXECUTED", "CANCELED", "PENDING"):
-            break
-        print(f'Статус операции "{status}" недоступен.')
-    result = [t for t in transactions if t.get("state") == status]
-    print(f'Операции отфильтрованы по статусу "{status}"')
-    return result
-
-
-def _sort_by_date(transactions: list[dict]) -> list[dict]:
-    """Сортирует по дате."""
-    print("Отсортировать операции по дате? Да/Нет")
-    if input().strip().lower() == "да":
-        print("Отсортировать по возрастанию или по убыванию?")
-        order = input().strip().lower()
-        reverse = order == "по убыванию"
-        transactions.sort(key=lambda t: t.get("date", ""), reverse=reverse)
-    return transactions
-
-
-def _filter_rub(transactions: list[dict]) -> list[dict]:
-    """Фильтрует только рублёвые транзакции."""
-    print("Выводить только рублевые транзакции? Да/Нет")
-    if input().strip().lower() == "да":
-        return [t for t in transactions if t.get("operationAmount", {}).get("currency", {}).get("code") == "RUB"]
-    return transactions
-
-
-def _filter_by_word(transactions: list[dict]) -> list[dict]:
-    """Фильтрует по слову в описании."""
-    print("Отфильтровать список транзакций по определенному слову в описании? Да/Нет")
-    if input().strip().lower() == "да":
-        word = input("Введите слово: ").strip()
-        return process_bank_search(transactions, word)
-    return transactions
+def _ask_sort_order() -> bool:
+    """Спрашивает порядок сортировки, возвращает reverse."""
+    print("Отсортировать по возрастанию или по убыванию?")
+    order = input().strip().lower()
+    return order == "по убыванию"
 
 
 def _print_transactions(transactions: list[dict]) -> None:
@@ -72,8 +39,16 @@ def _print_transactions(transactions: list[dict]) -> None:
     for t in transactions:
         date = t.get("date", "")[:10]
         description = t.get("description", "")
-        amount = t.get("operationAmount", {}).get("amount", "")
-        currency = t.get("operationAmount", {}).get("currency", {}).get("name", "")
+        amount = (
+            t.get("operationAmount", {}).get("amount", "")
+            if "operationAmount" in t
+            else t.get("amount", "")
+        )
+        currency = (
+            t.get("operationAmount", {}).get("currency", {}).get("name", "")
+            if "operationAmount" in t
+            else t.get("currency_name", "")
+        )
         print(f"{date} {description}")
         print(f"Сумма: {amount} {currency}")
         print()
@@ -91,10 +66,36 @@ def main() -> None:
     if not transactions:
         return
 
-    transactions = _filter_by_status(transactions)
-    transactions = _sort_by_date(transactions)
-    transactions = _filter_rub(transactions)
-    transactions = _filter_by_word(transactions)
+    # Фильтрация по статусу
+    while True:
+        print("Введите статус, по которому необходимо выполнить фильтрацию.")
+        print("Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING")
+        status = input().strip().upper()
+        if status in ("EXECUTED", "CANCELED", "PENDING"):
+            break
+        print(f'Статус операции "{status}" недоступен.')
+
+    transactions = filter_by_state(transactions, status)
+    print(f'Операции отфильтрованы по статусу "{status}"')
+
+    # Сортировка
+    print("Отсортировать операции по дате? Да/Нет")
+    if input().strip().lower() == "да":
+        reverse = _ask_sort_order()
+        transactions = sort_by_date(transactions, reverse=reverse)
+
+    # Фильтрация рублёвых
+    print("Выводить только рублевые транзакции? Да/Нет")
+    if input().strip().lower() == "да":
+        transactions = list(filter_by_currency(transactions, "RUB"))
+
+    # Фильтрация по слову
+    print("Отфильтровать список транзакций по определенному слову в описании? Да/Нет")
+    if input().strip().lower() == "да":
+        word = input("Введите слово: ").strip()
+        transactions = process_bank_search(transactions, word)
+
+    # Вывод
     _print_transactions(transactions)
 
 

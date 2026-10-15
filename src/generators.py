@@ -6,7 +6,14 @@ from typing import Iterator
 def filter_by_currency(transactions: list[dict], currency: str) -> Iterator[dict]:
     """Фильтрует транзакции по коду валюты."""
     for transaction in transactions:
-        if transaction.get("operationAmount", {}).get("currency", {}).get("code") == currency:
+        code = (
+            transaction.get("operationAmount", {})
+            .get("currency", {})
+            .get("code")
+        )
+        if code is None:
+            code = transaction.get("currency_code")
+        if code == currency:
             yield transaction
 
 
