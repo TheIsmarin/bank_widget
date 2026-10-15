@@ -31,6 +31,13 @@
 - `read_csv_transactions` — чтение транзакций из CSV-файла
 - `read_excel_transactions` — чтение транзакций из Excel-файла
 
+### `src/search.py`
+- `process_bank_search` — поиск операций по описанию (re)
+- `process_bank_operations` — подсчёт операций по категориям (Counter)
+
+### `src/main.py`
+- `main` — пользовательский интерфейс программы
+
 ## Установка
 
 1. Клонируйте репозиторий:
@@ -116,6 +123,16 @@ print(len(csv_data))  # количество транзакций
 
 excel_data = read_excel_transactions("data/transactions_excel.xlsx")
 print(len(excel_data))  # количество транзакций
+
+# Поиск и подсчёт операций
+from src.search import process_bank_search, process_bank_operations
+
+transactions = [
+    {"description": "Перевод организации"},
+    {"description": "Перевод с карты на карту"},
+]
+print(process_bank_search(transactions, "Перевод"))
+print(process_bank_operations(transactions, ["Перевод организации"]))
 ```
 
 ## Тестирование
@@ -147,6 +164,8 @@ poetry run pytest --cov=src --cov-report=html
 - `tests/test_utils.py` — тесты для загрузки JSON
 - `tests/test_external_api.py` — тесты для конвертации валют
 - `tests/test_readers.py` — тесты для чтения CSV и Excel
+- `tests/test_search.py` — тесты для поиска и подсчёта
+- `tests/test_main.py` — тесты для main
 
 ## Логирование
 
